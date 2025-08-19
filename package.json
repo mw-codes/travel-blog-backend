@@ -1,0 +1,25 @@
+{
+  "name": "travel-blog-backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mw-codes/travel-blog-backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mw-codes/travel-blog-backend/issues"
+  },
+  "homepage": "https://github.com/mw-codes/travel-blog-backend#readme",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "pg": "^8.16.3"
+  }
+}
