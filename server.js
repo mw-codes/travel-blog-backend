@@ -1,35 +1,50 @@
 import http from "http";
+import url from "url";
 import pool from "./config/db.js";
 
 // Server erstellen
 const server = http.createServer(async (req, res) => {
-  // CORS Headers setzen (damit Frontend zugreifen kann)
-  /* "Erlaube allen Webseiten, auf diesen Server zuzugreifen" Warum wichtig: Ohne das blockiert der Browser Anfragen vom Frontend! */
+  // CORS Headers setzen
   res.setHeader("Access-Control-Allow-Origin", "*");
-  /*"Ich sende JSON-Daten zurück" Warum wichtig: Browser weiß, wie er die Antwort behandeln soll */
   res.setHeader("Content-Type", "application/json");
 
-  try {
-    // Datenbank testen
-    const result = await pool.query("SELECT NOW()");
+  // URL und HTTP-Methode auslesen
+  const parsedUrl = url.parse(req.url, true);
+  const path = parsedUrl.pathname;
+  const method = req.method;
 
-    res.writeHead(200);
-    res.end(
-      JSON.stringify({
-        message: "Server und Datenbank laufen!",
-        database_time: result.rows[0].now,
-      })
-    );
+  console.log(`📥 ${method} ${path}`); // ← Hilft beim Debugging
+
+  try {
+    // ROUTING - Welche Route wurde aufgerufen?
+    if (method === "GET" && path === "/posts") {
+      // GET /posts - Alle Posts abrufen
+      const result = await pool.query("SELECT * FROM posts ORDER BY date DESC");
+
+      res.writeHead(200);
+      res.end(
+        JSON.stringify({
+          success: true,
+          data: result.rows,
+          count: result.rows.length,
+        })
+      );
+    } else {
+      // Fallback - Route nicht gefunden
+      res.writeHead(404);
+      res.end(JSON.stringify({ error: "Route nicht gefunden" }));
+    }
   } catch (error) {
+    console.error("❌ Server Fehler:", error);
     res.writeHead(500);
-    res.end(JSON.stringify({ error: "Datenbank-Fehler" }));
+    res.end(JSON.stringify({ error: "Server-Fehler" }));
   }
 });
 
-// Server auf Port 3000 starten
 const PORT = 3000;
 server.listen(PORT, () => {
-  console.log(`Server läuft auf http://localhost:${PORT}`);
+  console.log(`🚀 Server läuft auf http://localhost:${PORT}`);
+  console.log(`📋 API: http://localhost:${PORT}/posts`);
 });
 
 /* Stell dir vor, der Server ist ein Restaurant:
